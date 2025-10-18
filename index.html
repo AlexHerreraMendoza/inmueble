@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InmoVista – Encuentra Tu Hogar Ideal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #3b82f6;
+            --accent-color: #dbeafe;
+            --dark-color: #111827;
+            --light-color: #f9fafb;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+            background: var(--light-color);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(30, 58, 138, 0.8), rgba(30, 58, 138, 0.8)), 
+                        url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link, .nav-link-mobile {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link.active, .nav-link-mobile.active {
+            color: var(--primary-color) !important;
+            font-weight: bold;
+        }
+
+        .nav-link::after, .nav-link-mobile::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after, .nav-link.active::after,
+        .nav-link-mobile:hover::after, .nav-link-mobile.active::after {
+            width: 100%;
+        }
+
+        .property-card {
+            transition: all 0.4s ease;
+            border-radius: 12px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        .property-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .property-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(30, 58, 138, 0.9), transparent);
+            transform: translateY(100%);
+            transition: transform 0.4s ease;
+        }
+
+        .property-card:hover .property-overlay {
+            transform: translateY(0);
+        }
+
+        .contact-section {
+            background: linear-gradient(rgba(30, 58, 138, 0.9), rgba(30, 58, 138, 0.9)), 
+                        url('https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            transform: translateY(-6px);
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: #25D366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .whatsapp-btn:hover {
+            transform: scale(1.15);
+            box-shadow: 0 6px 25px rgba(37, 211, 102, 0.7);
+        }
+
+        .whatsapp-btn i {
+            color: white;
+            font-size: 34px;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { box-shadow: 0 0 0 18px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        .fade-in { opacity: 0; }
+        .slide-up { transform: translateY(60px); opacity: 0; }
+        .slide-left { transform: translateX(-60px); opacity: 0; }
+        .slide-right { transform: translateX(60px); opacity: 0; }
+        .zoom-in { transform: scale(0.85); opacity: 0; }
+        .rotate-in { transform: rotate(-10deg) scale(0.85); opacity: 0; }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .glow-btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .glow-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.6s;
+        }
+
+        .glow-btn:hover::before {
+            left: 100%;
+        }
+
+        .typewriter {
+            overflow: hidden;
+            border-right: 4px solid white;
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 4s steps(40, end), blink-caret 0.8s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: white }
+        }
+
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .nav-sticky {
+            transition: all 0.3s ease;
+        }
+
+        .nav-scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-menu {
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+        }
+
+     @media (max-width: 768px) {
+    .hero-section {
+        height: 80vh;
+    }
+
+    /* En pantallas pequeñas: animación de aparición suave */
+    .typewriter {
+        white-space: normal;
+        border-right: none;
+        animation: fadeInText 1.8s ease forwards;
+    }
+
+    @keyframes fadeInText {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .loader-circle {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--accent-color);
+            border-top: 5px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-circle"></div>
+    </div>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/63103430?text=Hola,%20me%20interesa%20saber%20más%20sobre%20sus%20propiedades" 
+       target="_blank" class="whatsapp-btn">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Header -->
+    <header class="nav-sticky fixed w-full z-50">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-12 h-12 bg-blue-900 rounded-full flex items-center justify-center text-white font-bold mr-3 logo">IV</div>
+                <h1 class="text-2xl font-bold text-blue-900">InmoVista</h1>
+            </div>
+
+            <!-- Desktop Menu -->
+            <nav class="hidden md:flex space-x-10">
+                <a href="#inicio" class="nav-link text-gray-800 hover:text-blue-600 font-medium transition-colors menu-link">Inicio</a>
+                <a href="#propiedades" class="nav-link text-gray-800 hover:text-blue-600 font-medium transition-colors menu-link">Propiedades</a>
+                <a href="#nosotros" class="nav-link text-gray-800 hover:text-blue-600 font-medium transition-colors menu-link">Nosotros</a>
+                <a href="#contacto" class="nav-link text-gray-800 hover:text-blue-600 font-medium transition-colors menu-link">Contacto</a>
+            </nav>
+
+            <button class="bg-blue-900 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-800 transition-colors glow-btn" onclick="scrollToSection('contacto')">
+                Agendar visita
+            </button>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-800">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white py-6 px-4 shadow-lg mobile-menu">
+            <a href="#inicio" class="block py-3 text-gray-800 hover:text-blue-600 font-medium nav-link-mobile">Inicio</a>
+            <a href="#propiedades" class="block py-3 text-gray-800 hover:text-blue-600 font-medium nav-link-mobile">Propiedades</a>
+            <a href="#nosotros" class="block py-3 text-gray-800 hover:text-blue-600 font-medium nav-link-mobile">Nosotros</a>
+            <a href="#contacto" class="block py-3 text-gray-800 hover:text-blue-600 font-medium nav-link-mobile">Contacto</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-section flex items-center justify-center text-white pt-20 relative">
+        <div class="particles" id="particles-container"></div>
+        <div class="container mx-auto px-4 text-center relative z-10">
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 slide-up typewriter">Encuentra Tu Hogar Ideal</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto slide-up">Descubre propiedades excepcionales que se adaptan a tu estilo de vida con InmoVista</p>
+            <button class="bg-white text-blue-900 px-10 py-3.5 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors slide-up glow-btn" onclick="scrollToSection('propiedades')">
+                Explorar propiedades
+            </button>
+        </div>
+
+        <!-- Scroll Arrow -->
+        <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 bounce-in">
+            <a href="#propiedades" class="text-white text-3xl animate-bounce" onclick="scrollToSection('propiedades')">
+                <i class="fas fa-chevron-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- Properties Section -->
+    <section id="propiedades" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-center text-blue-900 mb-12 slide-up">Propiedades Destacadas</h2>
+
+            <!-- Search Bar -->
+            <div class="max-w-lg mx-auto mb-12">
+                <div class="relative">
+                    <input type="text" id="property-search" placeholder="Buscar por ubicación, tipo o precio..." 
+                           class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-sm">
+                    <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex justify-center mb-12">
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button class="filter-btn active bg-blue-900 text-white px-5 py-2.5 rounded-lg glow-btn">Todas</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg hover:bg-gray-300 glow-btn">Casas</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg hover:bg-gray-300 glow-btn">Departamentos</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg hover:bg-gray-300 glow-btn">Oficinas</button>
+                    <button class="filter-btn bg-gray-200 text-gray-800 px-5 py-2.5 rounded-lg hover:bg-gray-300 glow-btn">Terrenos</button>
+                </div>
+            </div>
+
+            <!-- Properties Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Property 1 -->
+                <div class="property-card fade-in zoom-in" data-category="casa">
+                    <div class="relative h-72 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80" 
+                             alt="Casa moderna" class="w-full h-full object-cover lazy-load">
+                        <div class="property-overlay p-5 text-white">
+                            <h3 class="text-xl font-bold mb-2">Casa Moderna</h3>
+                            <p class="mb-2">4 dormitorios, 3 baños, 250m²</p>
+                            <p class="font-bold">$450,000</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-bold text-blue-900">Casa en Residencial Norte</h3>
+                            <span class="bg-blue-100 text-blue-900 px-2.5 py-1 rounded text-sm">Casa</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Hermosa casa con acabados de lujo, piscina y jardín amplio.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-gray-500">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span>Zona Norte</span>
+                            </div>
+                            <button class="text-blue-900 font-medium hover:text-blue-700">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property 2 -->
+                <div class="property-card fade-in zoom-in" data-category="departamento">
+                    <div class="relative h-72 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" 
+                             alt="Departamento de lujo" class="w-full h-full object-cover lazy-load">
+                        <div class="property-overlay p-5 text-white">
+                            <h3 class="text-xl font-bold mb-2">Departamento Premium</h3>
+                            <p class="mb-2">3 dormitorios, 2 baños, 120m²</p>
+                            <p class="font-bold">$280,000</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-bold text-blue-900">Apartamento en Torre Central</h3>
+                            <span class="bg-blue-100 text-blue-900 px-2.5 py-1 rounded text-sm">Departamento</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Moderno departamento con vista panorámica y amenities de lujo.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-gray-500">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span>Centro</span>
+                            </div>
+                            <button class="text-blue-900 font-medium hover:text-blue-700">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property 3 -->
+                <div class="property-card fade-in zoom-in" data-category="oficina">
+                    <div class="relative h-72 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80" 
+                             alt="Oficina moderna" class="w-full h-full object-cover lazy-load">
+                        <div class="property-overlay p-5 text-white">
+                            <h3 class="text-xl font-bold mb-2">Oficina Ejecutiva</h3>
+                            <p class="mb-2">80m², 2 salas de reuniones</p>
+                            <p class="font-bold">$180,000</p>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-xl font-bold text-blue-900">Oficina en Distrito Financiero</h3>
+                            <span class="bg-blue-100 text-blue-900 px-2.5 py-1 rounded text-sm">Oficina</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">Espacio de trabajo moderno con excelente ubicación y acceso a transporte.</p>
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center text-gray-500">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                <span>Distrito Financiero</span>
+                            </div>
+                            <button class="text-blue-900 font-medium hover:text-blue-700">Ver detalles</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <button class="bg-blue-900 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-800 transition-colors glow-btn">
+                    Ver todas las propiedades
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="nosotros" class="py-20 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0 md:pr-10 fade-in slide-left">
+                    <img src="https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?ixlib=rb-4.0.3&auto=format&fit=crop&w=2073&q=80" 
+                         alt="Equipo InmoVista" class="rounded-xl shadow-lg w-full lazy-load">
+                </div>
+                <div class="md:w-1/2 md:pl-10 slide-up">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-blue-900 mb-6">Sobre InmoVista</h2>
+                    <p class="text-gray-700 mb-4 text-lg">
+                        Con más de 15 años en el mercado inmobiliario, InmoVista es líder en la intermediación de propiedades premium, ofreciendo un servicio personalizado y de excelencia.
+                    </p>
+                    <p class="text-gray-700 mb-6 text-lg">
+                        Nuestro equipo de expertos está dedicado a encontrar la propiedad perfecta que se adapte a tus necesidades y estilo de vida, con un enfoque en calidad y transparencia.
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        <div class="flex items-center">
+                            <div class="bg-blue-900 text-white p-3 rounded-full mr-3">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Compromiso con la calidad</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-blue-900 text-white p-3 rounded-full mr-3">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Transparencia total</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-blue-900 text-white p-3 rounded-full mr-3">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Atención personalizada</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="bg-blue-900 text-white p-3 rounded-full mr-3">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-700">Amplia cartera de propiedades</span>
+                        </div>
+                    </div>
+
+                    <button class="bg-blue-900 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-800 transition-colors glow-btn">
+                        Conoce nuestro equipo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contacto" class="contact-section py-20 text-white parallax-bg">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-center mb-12 slide-up">Contáctanos</h2>
+
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 mb-8 md:mb-0 md:pr-10 fade-in slide-left">
+                    <form class="bg-white p-8 rounded-xl shadow-lg text-gray-800">
+                        <div class="mb-5">
+                            <label class="block text-gray-700 mb-2 font-medium" for="name">Nombre</label>
+                            <input type="text" id="name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div class="mb-5">
+                            <label class="block text-gray-700 mb-2 font-medium" for="email">Correo electrónico</label>
+                            <input type="email" id="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600">
+                        </div>
+                        <div class="mb-5">
+                            <label class="block text-gray-700 mb-2 font-medium" for="message">Mensaje</label>
+                            <textarea id="message" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"></textarea>
+                        </div>
+                        <button type="submit" class="bg-blue-900 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-800 transition-colors w-full glow-btn">
+                            Enviar mensaje
+                        </button>
+                    </form>
+                </div>
+
+                <div class="md:w-1/2 md:pl-10 slide-up">
+                    <div class="mb-8">
+                        <h3 class="text-2xl font-bold mb-4">Información de contacto</h3>
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-map-marker-alt text-blue-300 mr-3 text-xl"></i>
+                            <p>Av. Principal 123, Ciudad Central</p>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-phone text-blue-300 mr-3 text-xl"></i>
+                            <p>+1 (555) 123-4567</p>
+                        </div>
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-envelope text-blue-300 mr-3 text-xl"></i>
+                            <p>info@inmovista.com</p>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-blue-300 mr-3 text-xl"></i>
+                            <p>Lun - Vie: 9:00 - 18:00</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">Síguenos</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="social-icon bg-white text-blue-900 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-icon bg-white text-blue-900 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-icon bg-white text-blue-900 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="#" class="social-icon bg-white text-blue-900 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-900 text-white py-10">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-900 font-bold mr-3 logo">IV</div>
+                        <h2 class="text-2xl font-bold">InmoVista</h2>
+                    </div>
+                    <p class="mt-2 text-blue-200">Tu hogar ideal desde 2008</p>
+                </div>
+
+                <div class="text-center md:text-right">
+                    <p class="text-blue-200">© 2025 InmoVista. Todos los derechos reservados.</p>
+                    <div class="mt-2">
+                        <a href="#" class="text-blue-200 hover:text-white mx-2">Política de privacidad</a>
+                        <a href="#" class="text-blue-200 hover:text-white mx-2">Términos de servicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize GSAP with ScrollTrigger and TextPlugin
+        gsap.registerPlugin(ScrollTrigger, TextPlugin);
+
+        // Function to scroll smoothly to a section
+          function scrollToSection(sectionId) {
+        const targetElement = document.getElementById(sectionId);
+        if (targetElement) {
+            const headerHeight = document.querySelector('header').offsetHeight;
+            
+            gsap.to(window, {
+                duration: 0.3, // ⚡ más rápido
+                scrollTo: {
+                    y: targetElement,
+                    offsetY: headerHeight
+                },
+                ease: "power2.out", // transición fluida
+                onComplete: () => {
+                    // pequeño rebote opcional
+                    gsap.fromTo(targetElement, 
+                        { y: -10 }, 
+                        { y: 0, duration: 0.4, ease: "elastic.out(1, 0.5)" }
+                    );
+                }
+            });
+
+            // Cierra menú móvil si está abierto
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (!mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('active');
+            }
+
+            // Actualiza el enlace activo
+            updateActiveNavLink(sectionId);
+        }
+    }
+
+
+
+
+        // Function to update active navigation link
+        function updateActiveNavLink(sectionId) {
+            document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${sectionId}`) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Page Load Handler
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loader after 1.5s
+            gsap.to('#loader', {
+                opacity: 0,
+                duration: 0.5,
+                delay: 1.5,
+                onComplete: () => {
+                    document.getElementById('loader').style.display = 'none';
+                }
+            });
+
+            // Create particles for hero section
+            createParticles();
+
+            // Sticky navigation effect
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                if (window.scrollY > 50) {
+                    header.classList.add('nav-scrolled');
+                } else {
+                    header.classList.remove('nav-scrolled');
+                }
+
+                // Update active nav link on scroll
+                updateNavOnScroll();
+            });
+
+            // Logo animation
+            gsap.from('.logo', {
+                duration: 1.2,
+                scale: 0,
+                rotation: 360,
+                ease: 'back.out(2)'
+            });
+
+            // Menu links animation
+            gsap.from('.menu-link', {
+                duration: 0.8,
+                y: -30,
+                opacity: 0,
+                stagger: 0.15,
+                delay: 0.6
+            });
+
+            // Hero section animations
+            gsap.to('.slide-up', {
+                duration: 1.2,
+                y: 0,
+                opacity: 1,
+                stagger: 0.3,
+                ease: 'power4.out'
+            });
+
+            // Scroll arrow animation
+            gsap.to('.bounce-in', {
+                duration: 1.5,
+                y: 0,
+                opacity: 1,
+                delay: 2,
+                ease: 'bounce.out'
+            });
+
+            // Scroll-triggered animations
+            gsap.utils.toArray('.fade-in').forEach(element => {
+                gsap.fromTo(element, {
+                    opacity: 0,
+                    y: 60
+                }, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1.2,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 85%',
+                        end: 'bottom 15%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            gsap.utils.toArray('.slide-left').forEach(element => {
+                gsap.fromTo(element, {
+                    opacity: 0,
+                    x: -60
+                }, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1.2,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 85%',
+                        end: 'bottom 15%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            gsap.utils.toArray('.slide-right').forEach(element => {
+                gsap.fromTo(element, {
+                    opacity: 0,
+                    x: 60
+                }, {
+                    opacity: 1,
+                    x: 0,
+                    duration: 1.2,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 85%',
+                        end: 'bottom 15%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            gsap.utils.toArray('.zoom-in').forEach(element => {
+                gsap.fromTo(element, {
+                    opacity: 0,
+                    scale: 0.85
+                }, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1.2,
+                    ease: 'power3.out',
+                    scrollTrigger: {
+                        trigger: element,
+                        start: 'top 85%',
+                        end: 'bottom 15%',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            });
+
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.toggle('active');
+                if (mobileMenu.classList.contains('active')) {
+                    gsap.fromTo(mobileMenu, {
+                        y: -20,
+                        opacity: 0
+                    }, {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.4,
+                        ease: 'power3.out'
+                    });
+                }
+            });
+
+            // Navigation link click handlers
+            document.querySelectorAll('.nav-link, .nav-link-mobile').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const sectionId = this.getAttribute('href').substring(1);
+                    scrollToSection(sectionId);
+                });
+            });
+
+            // Property filter buttons
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const propertyCards = document.querySelectorAll('.property-card');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => {
+                        btn.classList.remove('active', 'bg-blue-900', 'text-white');
+                        btn.classList.add('bg-gray-200', 'text-gray-800');
+                    });
+                    this.classList.remove('bg-gray-200', 'text-gray-800');
+                    this.classList.add('active', 'bg-blue-900', 'text-white');
+                    const filter = this.textContent.toLowerCase();
+                    propertyCards.forEach(card => {
+                        if (filter === 'todas' || card.dataset.category === filter) {
+                            card.style.display = 'block';
+                            gsap.fromTo(card, 
+                                { opacity: 0, scale: 0.85 }, 
+                                { opacity: 1, scale: 1, duration: 0.6, ease: 'power3.out' }
+                            );
+                        } else {
+                            gsap.to(card, {
+                                opacity: 0,
+                                scale: 0.85,
+                                duration: 0.4,
+                                ease: 'power3.in',
+                                onComplete: () => { card.style.display = 'none'; }
+                            });
+                        }
+                    });
+                });
+            });
+
+            // Property search functionality
+            const searchInput = document.getElementById('property-search');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                propertyCards.forEach(card => {
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    const location = card.querySelector('.text-gray-500 span')?.textContent.toLowerCase() || '';
+                    if (title.includes(searchTerm) || location.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        gsap.fromTo(card, 
+                            { opacity: 0, scale: 0.85 }, 
+                            { opacity: 1, scale: 1, duration: 0.6 }
+                        );
+                    } else {
+                        gsap.to(card, {
+                            opacity: 0,
+                            scale: 0.85,
+                            duration: 0.4,
+                            onComplete: () => { card.style.display = 'none'; }
+                        });
+                    }
+                });
+            });
+
+            // Typewriter effect for title
+            const title = document.querySelector('.typewriter');
+                if (title) {
+                    const text = title.textContent;
+                    title.textContent = '';
+                    gsap.to(title, {
+                        duration: 4,
+                        text: text,
+                        ease: 'none'
+                    });
+                }
+
+            // Lazy load images
+            const lazyImages = document.querySelectorAll('.lazy-load');
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.src;
+                        img.classList.remove('lazy-load');
+                        observer.unobserve(img);
+                    }
+                });
+            });
+            lazyImages.forEach(img => imageObserver.observe(img));
+        });
+
+        // Update active navigation link on scroll
+        function updateNavOnScroll() {
+            const sections = ['inicio', 'propiedades', 'nosotros', 'contacto'];
+            const scrollPosition = window.scrollY + document.querySelector('header').offsetHeight;
+            let activeSection = 'inicio';
+
+            sections.forEach(section => {
+                const element = document.getElementById(section);
+                if (element && scrollPosition >= element.offsetTop && scrollPosition < element.offsetTop + element.offsetHeight) {
+                    activeSection = section;
+                }
+            });
+
+            updateActiveNavLink(activeSection);
+        }
+
+        // Particle animation for hero section
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            const particleCount = 50;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                const size = Math.random() * 6 + 2;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const opacity = Math.random() * 0.4 + 0.2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.opacity = opacity;
+                container.appendChild(particle);
+                gsap.to(particle, {
+                    y: Math.random() * 120 - 60,
+                    x: Math.random() * 120 - 60,
+                    duration: Math.random() * 12 + 8,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: 'sine.inOut',
+                    delay: Math.random() * 2
+                });
+            }
+        }
+
+        // Parallax effect for contact section
+        gsap.to('.contact-section', {
+            backgroundPosition: '50% 100px',
+            ease: 'none',
+            scrollTrigger: {
+                trigger: '.contact-section',
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true
+            }
+        });
+    </script>
+</body>
+</html>
